@@ -10,37 +10,47 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # 📥 Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ⚡ Setup pnpm (latest stable)
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: false
 
+      # 🟢 Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
 
+      # 📦 Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      # ✅ Pass repo name here (IMPORTANT)
+      # 🏗️ Build Next.js app
       - name: Build project
         run: pnpm build
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
 
+      # 📤 Export static files (Next.js export)
       - name: Export static files
         run: pnpm next export
 
+      # 📦 Upload build output
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -51,5 +61,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 🚀 Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
