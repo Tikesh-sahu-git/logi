@@ -14,12 +14,16 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
+# ✅ Force GitHub Actions to use Node 24 runtime
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 📥 Checkout code
+      # 📥 Checkout code (latest)
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -30,11 +34,12 @@ jobs:
           version: 10
           run_install: false
 
-      # 🟢 Setup Node.js
+      # 🟢 Setup Node.js (your app runtime)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
       # 📦 Install dependencies
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -45,7 +50,7 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      # 📤 Export static files (Next.js export)
+      # 📤 Export static files
       - name: Export static files
         run: pnpm next export
 
